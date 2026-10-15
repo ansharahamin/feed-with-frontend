@@ -1,8 +1,11 @@
 import postModel from './models/post.model.js'
+import multer from "multer"
 import express from 'express'
 
 const app = express()
 app.use(express.json())
+const storage = multer.memoryStorage()
+const upload = multer({storage:storage})
 const posts = [{ title: "smit", des: "smitworld", id: 1 }, { title: "neha", des: "nehaworld", id: 2 }, { title: "master", des: "masterworld", id: 3 }]
 
 app.get('/', async (req, res) => {
