@@ -1,29 +1,75 @@
-import { log } from 'console'
+import postModel from './models/post.model.js'
 import express from 'express'
+
 const app = express()
 app.use(express.json())
-const posts = [{title:"smit",des:"smitworld",id:1},{title:"neha",des:"nehaworld",id:2},{title:"master",des:"masterworld",id:3}]
-app.get('/',(req,res)=>{
-res.send('Hello World')
+const posts = [{ title: "smit", des: "smitworld", id: 1 }, { title: "neha", des: "nehaworld", id: 2 }, { title: "master", des: "masterworld", id: 3 }]
+
+app.get('/', async (req, res) => {
+    try {
+        const posts = await postModel.find()
+        if (posts.length === 0) {
+          return  res.status(404)
+                .json({ message: 'no posts found' })
+        }
+        res.status(200).json({ message: 'post fetched successfully', posts })
+
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+
 })
 
-app.post('/posts',(req,res)=>{
-console.log(req.body)
-posts.push({id:posts.length+1,...req.body})
-res.send({message:"post added successfully"})
+// app.post('/posts', (req, res) => {
+//     console.log(req.body)
+//     posts.push({ id: posts.length + 1, ...req.body })
+//     res.send({ message: "post added successfully" })
+// })
+
+app.post('/posts',async (req,res)=>{
+    const data = req.body
+    try {
+        if(!data.title || !data.des){
+          return  res.status(400).json({message:'bad request'})
+        }
+      const posts =  await postModel.create({
+            title:data.title,
+            des:data.des
+        })
+        res.status(201).json({message:'posts sent successfully'},posts)
+    } catch (error) {
+        res.status(500).json({message:'internal server error'})
+    }
 })
-app.delete('/posts/:id',(req,res)=>{
+
+//express delete
+// app.delete('/posts/:id', (req, res) => {
+//     let index = posts.findIndex(v => v.id == Number(req.params.id))
+//     posts.splice(index, 1)
+//     res.send({ message: 'user deleted successfully' })
+// })
+
+//mongodb delete
+app.delete('/posts/:id',async (req,res)=>{
+    const id = req.params.id
+    try {
+    
+        const postDeleted = await postModel.findByIdAndDelete(id)
+            if(!postDeleted){
+            return res.status(404).json({message:"post not found"})
+        }
+        res.status(200).json({message:"post deleted successfully"})
+    } catch (error) {
+        res.status(500).json({message:"internal server error"})
+    }
+})
+app.put('/posts/:id', (req, res) => {
     let index = posts.findIndex(v => v.id == Number(req.params.id))
-    posts.splice(index,1)
-    res.send({message:'user deleted successfully'})
+    posts.splice(index, 1, { id: Number(req.params.id), ...req.body })
+    res.send({ message: 'user updated successfully' })
 })
-app.put('/posts/:id',(req,res)=>{
-    let index = posts.findIndex(v => v.id == Number(req.params.id))
-    posts.splice(index,1,{id:Number(req.params.id),...req.body})
-    res.send({message:'user updated successfully'})
-})
-app.get('/posts',(req,res)=>{
-res.send(posts)
+app.get('/posts', (req, res) => {
+    res.send(posts)
 
 })
 export default app
