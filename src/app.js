@@ -63,13 +63,34 @@ app.delete('/posts/:id',async (req,res)=>{
         res.status(500).json({message:"internal server error"})
     }
 })
-app.put('/posts/:id', (req, res) => {
-    let index = posts.findIndex(v => v.id == Number(req.params.id))
-    posts.splice(index, 1, { id: Number(req.params.id), ...req.body })
-    res.send({ message: 'user updated successfully' })
-})
-app.get('/posts', (req, res) => {
-    res.send(posts)
+
+//mongodb update
+app.put('/posts/:id',async (req,res)=>{
+    try {
+           const id = req.params.id
+    const data = req.body
+    if(!data.title||!data.des){
+        return res.status(400).json({message:"title and des are required"})
+    }
+const updatedPost = await postModel.findByIdAndUpdate(id,{title:data.title,des:data.des},{ new: true })
+if(!updatedPost){
+    return res.status(404).json({message:"post not found"})
+}
+    res.status(200).json({message:'post updated successfully'},updatedPost) 
+    } catch (error) {
+        res.status(500).json({message:error.message})
+    }
 
 })
+
+//express update
+// app.put('/posts/:id', (req, res) => {
+//     let index = posts.findIndex(v => v.id == Number(req.params.id))
+//     posts.splice(index, 1, { id: Number(req.params.id), ...req.body })
+//     res.send({ message: 'user updated successfully' })
+// })
+// app.get('/posts', (req, res) => {
+//     res.send(posts)
+
+// })
 export default app
