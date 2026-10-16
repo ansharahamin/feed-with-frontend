@@ -2,7 +2,7 @@ import express from 'express'
 import app from './src/app.js'
 import connectedDB from "./src/db/db.js"
 
-const PORT = 3000
+const PORT = 4000
 connectedDB()
 
 

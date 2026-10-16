@@ -45,13 +45,18 @@ app.post('/posts',async (req,res)=>{
     }
 })
 //img upload
-app.post('/upload',upload.single('image'),(req,res)=>{
+app.post('/upload',upload.single('image'),async(req,res)=>{
     const data = req.body
     const imgBuffer = req.file.buffer
     console.log(data,imgBuffer)
     const result = uploadFile(imgBuffer)
     console.log(result)
-    res.status(200).json({message:"img added"})
+    const post = await postModel.create({
+        image:result.url,
+        des:data.des
+    })
+    res.status(200).json({message:"img added",post})
+
 })
 
 
