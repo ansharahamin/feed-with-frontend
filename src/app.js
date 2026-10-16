@@ -1,7 +1,7 @@
 import postModel from './models/post.model.js'
 import multer from "multer"
 import express from 'express'
-
+import uploadFile from '../services/storage.service.js'
 const app = express()
 app.use(express.json())
 const storage = multer.memoryStorage()
@@ -49,6 +49,8 @@ app.post('/upload',upload.single('image'),(req,res)=>{
     const data = req.body
     const imgBuffer = req.file.buffer
     console.log(data,imgBuffer)
+    const result = uploadFile(imgBuffer)
+    console.log(result)
     res.status(200).json({message:"img added"})
 })
 
