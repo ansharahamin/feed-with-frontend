@@ -44,6 +44,14 @@ app.post('/posts',async (req,res)=>{
         res.status(500).json({message:'internal server error'})
     }
 })
+//img upload
+app.post('/upload',upload.single('image'),(req,res)=>{
+    const data = req.body
+    const imgBuffer = req.file.buffer
+    console.log(data,imgBuffer)
+    res.status(200).json({message:"img added"})
+})
+
 
 //express delete
 // app.delete('/posts/:id', (req, res) => {
