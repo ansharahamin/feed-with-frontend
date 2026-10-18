@@ -45,20 +45,21 @@ app.post('/posts',async (req,res)=>{
     }
 })
 //img upload
-app.post('/upload',upload.single('image'),async(req,res)=>{
-    const data = req.body
-    const imgBuffer = req.file.buffer
-    console.log(data,imgBuffer)
-    const result = uploadFile(imgBuffer)
-    console.log(result)
-    const post = await postModel.create({
-        image:result.url,
-        des:data.des
-    })
-    res.status(200).json({message:"img added",post})
-
+app.post('/upload', upload.single('image'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'image is required' })
+        }
+        const result = await uploadFile(req.file.buffer)
+        const post = await postModel.create({
+            image: result.url,
+            des: req.body.des
+        })
+        res.status(200).json({ message: 'img added', post })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
 })
-
 
 //express delete
 // app.delete('/posts/:id', (req, res) => {
