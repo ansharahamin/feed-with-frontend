@@ -2,8 +2,10 @@ import postModel from './models/post.model.js'
 import multer from "multer"
 import express from 'express'
 import uploadFile from '../services/storage.service.js'
+import cors from 'cors'
 const app = express()
 app.use(express.json())
+app.use(cors())
 const storage = multer.memoryStorage()
 const upload = multer({storage:storage})
 const posts = [{ title: "smit", des: "smitworld", id: 1 }, { title: "neha", des: "nehaworld", id: 2 }, { title: "master", des: "masterworld", id: 3 }]
